@@ -4,7 +4,7 @@
 ## Tecnologias Utilizadas
 * Python
 * SQLite
-* Via CEP API
+* Via CEP API (https://viacep.com.br)
 
 ## Pré-requisitos
 * Python 3.6 ou superior instalado
