@@ -42,7 +42,7 @@ if respostaAPI.status_code == 200 and jErro == False:
     time.sleep(seconds)
 
     # chama o método que insere os dados no banco de dados
-    info_cep.salvar()
+    info_cep.inserir_dados()
 
 # se a chamada for bem sucedida mas o CEP informado for inválido (ex.: 99999999)
 elif respostaAPI.status_code == 200 and jErro == True:

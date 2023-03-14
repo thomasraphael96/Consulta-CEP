@@ -1,4 +1,7 @@
 import sqlite3
+import time
+
+seconds = 2
 
 # classe de endereços
 class Endereco(object):
@@ -6,24 +9,21 @@ class Endereco(object):
     def __init__(self):
         self.cep = None
         self.logradouro = None
-        self.complemento = None
         self.bairro = None
         self.localidade = None
         self.uf = None
         self.ddd = None
-        self.ibge = None
-        self.gia = None
 
 # método para criar a tabela "enderecos" caso ela não exista
-    def cria_tabela(self):
+    def criar_tabela(self):
         conn = sqlite3.connect("via_cep.db")
         cursor = conn.cursor()
 
         cursor.execute(
             """
-            CREATE TABLE IF NOT EXISTS enderecos (
-            cep text, logradouro text, complemento text, bairro text, localidade text,
-            uf text, ddd text, ibge text, gia text
+            CREATE TABLE IF NOT EXISTS tb_endereco (
+            cep text, logradouro text, bairro text, cidade text,
+            uf text, ddd text
             )
             """
         )
@@ -31,19 +31,21 @@ class Endereco(object):
         conn.commit()
 
 # método para inserir os dados na tabela "enderecos" do banco de dados "via_cep"
-    def salvar(self):
+    def inserir_dados(self):
         
-        self.cria_tabela()
+        self.criar_tabela()
 
         conn = sqlite3.connect("via_cep.db")
         cursor = conn.cursor()
         cursor.execute(
             """
-            INSERT INTO enderecos VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s')
+            INSERT INTO enderecos VALUES('%s','%s','%s','%s','%s','%s')
             """
-            %(self.cep, self.logradouro, self.complemento, self.bairro, self.localidade, self.uf, self.ddd, self.ibge, self.gia)
+            %(self.cep, self.logradouro, self.bairro, self.localidade, self.uf, self.ddd)
         )
 
         conn.commit()
+
+        time.sleep(seconds)
 
         print("Informações de endereço salvas no banco de dados")
