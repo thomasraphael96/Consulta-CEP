@@ -39,7 +39,7 @@ class Endereco(object):
         cursor = conn.cursor()
         cursor.execute(
             """
-            INSERT INTO enderecos VALUES('%s','%s','%s','%s','%s','%s')
+            INSERT INTO tb_endereco VALUES('%s','%s','%s','%s','%s','%s')
             """
             %(self.cep, self.logradouro, self.bairro, self.localidade, self.uf, self.ddd)
         )
@@ -48,4 +48,4 @@ class Endereco(object):
 
         time.sleep(seconds)
 
-        print("Informações de endereço salvas no banco de dados")
+        print("Informações de endereço salvas no banco de dados!")
