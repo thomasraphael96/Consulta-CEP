@@ -1,37 +1,65 @@
 from config_database import Endereco
-import requests as chamadaAPI
+import requests
 import json
+import time
+
+# tempo em segundos utilizado na função time.sleep(seconds)
+seconds = 2
 
 # variavel que armazena o CEP que o usuário digitar
-cep = input("Digite um cep: ")
+cep_informado = input("Digite um CEP: ")
+cep_informado = cep_informado.replace(" ","")
+cep_informado = cep_informado.replace("-","")
+cep_informado = cep_informado.replace(".","")
 
 print('Procurando CEP informado...')
+time.sleep(seconds)
 
 # realiza a chamada na API passando o CEP informado pelo usuário
-respostaAPI = chamadaAPI.get("https://viacep.com.br/ws/%s/json/" %cep)
+respostaAPI = requests.get("https://viacep.com.br/ws/%s/json/" %cep_informado)
 
-# validação do código de retorno da chamada
-if respostaAPI.status_code == chamadaAPI.codes.ok:
+# converte a resposta da chamada na API (JSON) para um dicionário
+j = json.loads(respostaAPI.text)
+
+# valida se existe o parâmetro 'erro' dentro do dicionário
+jErro = 'erro' in j
+
+# se a chamada for bem sucedida e o CEP informado for válido
+if respostaAPI.status_code == 200 and jErro == False:
     
     print('CEP encontrado...')
     
-    #converte a resposta da chamada na API para um objeto do tipo json
-    j = json.loads(respostaAPI.text)
-
     # criando o objeto do tipo Endereco() e abastecendo seus atributos
-    endereco = Endereco()
+    info_cep = Endereco()
     
-    endereco.cep = j['cep']
-    endereco.logradouro = j['logradouro']
-    endereco.complemento = j['complemento']
-    endereco.bairro = j['bairro']
-    endereco.localidade = j['localidade']
-    endereco.uf = j['uf']
-    endereco.ddd = j['ddd']
-    endereco.ibge = j['ibge']
-    endereco.gia = j['gia']
+    info_cep.cep = j['cep']
+    info_cep.logradouro = j['logradouro']
+    info_cep.bairro = j['bairro']
+    info_cep.localidade = j['localidade']
+    info_cep.uf = j['uf']
+    info_cep.ddd = j['ddd']
 
-    endereco.salvar()
+    time.sleep(seconds)
 
+    # chama o método que insere os dados no banco de dados
+    info_cep.salvar()
+
+# se a chamada for bem sucedida mas o CEP informado for inválido (ex.: 99999999)
+elif respostaAPI.status_code == 200 and jErro == True:
+    print("=========== ERRO ===========")
+    print("CEP inexistente")
+
+# se a chamada for mal sucedida porque o CEP informado não tiver 8 dígitos
+elif respostaAPI.status_code == 400 and len(cep_informado) != 8:
+    print("=========== ERRO ===========")
+    print("CEP informado não contém 8 dígitos. Tente novamente.")
+
+# se a chamada for mal sucedida porque o CEP informado contém letras
+elif respostaAPI.status_code == 400 and cep_informado.isnumeric():
+    print("=========== ERRO ===========")
+    print("CEP informado deve conter somente números. Tente novamente.")
+
+# se a chamada for mal sucedida e o motivo não está mapeado
 else:
-    print('CEP não encontrado')
+    print("=========== ERRO ===========")
+    print("Erro não mapeado")
